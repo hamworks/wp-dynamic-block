@@ -1,0 +1,27 @@
+{
+    "name": "hamworks/wp-dynamic-block",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Hiroshi Urabe",
+            "email": "urabe@ham.works"
+        }
+    ],
+    "require": {
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "*",
+        "dealerdirect/phpcodesniffer-composer-installer": "*",
+        "wp-coding-standards/wpcs": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "HAMWORKS\\WP\\Dynamic_Block\\" : "src/"
+        }
+    },
+    "scripts" : {
+        "format": "phpcbf --standard=./.phpcs.xml.dist --report-summary --report-source",
+        "lint": "phpcs --standard=./.phpcs.xml.dist",
+        "phpcs": "phpcs --standard=./.phpcs.xml.dist"
+    }
+}
