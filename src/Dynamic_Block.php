@@ -170,7 +170,7 @@ class Dynamic_Block {
 		 * @param Dynamic_Block $this The Dynamic_Block_Factory instance (passed by reference).
 		 * @param array $attributes block attributes.
 		 */
-		do_action( 'hw_dynamic_block_template_argument', $attributes, $this );
+		do_action( 'hw_dynamic_block_template_argument', $this, $attributes );
 
 		$output = $this->get_template_part( join( '/', $path ), $this->get_style_name( $class_name ), $this->args );
 
