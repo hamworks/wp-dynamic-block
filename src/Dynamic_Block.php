@@ -37,9 +37,9 @@ class Dynamic_Block {
 	 * @param string $file_or_folder Path to the JSON file with metadata definition for
 	 *                               the block or path to the folder where the `block.json` file is located.
 	 * @param array  $args {
-	 *       Optional. Array of block type arguments. Accepts any public property of `WP_Block_Type`.
-	 *       Any arguments may be defined, however the ones described below are supported by default.
-	 *       Default empty array.
+	 *        Optional. Array of block type arguments. Accepts any public property of `WP_Block_Type`.
+	 *        Any arguments may be defined, however the ones described below are supported by default.
+	 *        Default empty array.
 	 *
 	 * @type callable $render_callback Callback used to render blocks of this block type.
 	 * }
@@ -107,8 +107,9 @@ class Dynamic_Block {
 	 *
 	 * @return string
 	 */
-	private function get_template_part_dir() {
+	private function get_template_parts_dir() {
 		$template_part_dir = 'template-parts/blocks';
+		$template_part_dir = apply_filters( 'hw_dynamic_block_template_parts_dir', $template_part_dir );
 
 		return trim( $template_part_dir, '/\\' );
 	}
@@ -119,7 +120,7 @@ class Dynamic_Block {
 	 * @param string $slug The slug name for the generic template.
 	 * @param string $name The name of the specialised template.
 	 * @param array  $args Optional. Additional arguments passed to the template.
-	 *                      Default empty array.
+	 *                       Default empty array.
 	 *
 	 * @return string
 	 */
@@ -157,7 +158,7 @@ class Dynamic_Block {
 	protected function get_content_from_template( $attributes ) {
 		$class_name = join( ' ', $this->get_class_names( $attributes ) );
 		$path       = array(
-			$this->get_template_part_dir(),
+			$this->get_template_parts_dir(),
 			$this->name,
 		);
 
@@ -169,7 +170,7 @@ class Dynamic_Block {
 		 * @param Dynamic_Block $this The Dynamic_Block_Factory instance (passed by reference).
 		 * @param array $attributes block attributes.
 		 */
-		add_action( 'hw_dynamic_block_factory_template_argument', $this, $attributes );
+		do_action( 'hw_dynamic_block_template_argument', $attributes, $this );
 
 		$output = $this->get_template_part( join( '/', $path ), $this->get_style_name( $class_name ), $this->args );
 
@@ -177,11 +178,15 @@ class Dynamic_Block {
 			return $output;
 		}
 
-		if ( file_exists( $this->dir . '/template.php' ) ) {
+		$template_path = $this->dir . '/template.php';
+		$template_path = apply_filters( 'hw_dynamic_block_fallback_template_path', $template_path, $this );
+
+		if ( file_exists( $template_path ) ) {
 			ob_start();
-			load_template( $this->dir . '/template.php', false, $this->args );
+			load_template( $template_path, false, $this->args );
 			$output = ob_get_contents();
 			ob_end_clean();
+
 			return $output;
 		}
 
