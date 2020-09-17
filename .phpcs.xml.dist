@@ -1,15 +1,24 @@
 <?xml version="1.0"?>
-<ruleset name="WP library">
-	<file>./src</file>
+<ruleset name="WordPress Coding Standards based custom ruleset for your plugin">
+	<!-- What to scan -->
+	<file>.</file>
+	<exclude-pattern>/vendor/</exclude-pattern>
+	<exclude-pattern>/node_modules/</exclude-pattern>
+
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
+
 	<config name="minimum_supported_wp_version" value="5.3"/>
+	<!-- Rules: Check PHP version compatibility -->
+	<config name="testVersion" value="7.2-"/>
+	<rule ref="PHPCompatibilityWP"/>
 
 	<rule ref="WordPress">
-		<exclude name="WordPress.WP.I18n"/>
+		<exclude name="Generic.Commenting.DocComment.MissingShort" />
+		<exclude name="Squiz.Commenting.FileComment"/>
 		<exclude name="WordPress.Files.FileName" />
-		<exclude name="WordPress.WP.GlobalVariablesOverride.OverrideProhibited" />
 	</rule>
+
 	<rule ref="WordPress.WhiteSpace.ControlStructureSpacing">
 		<properties>
 			<property name="blank_line_check" value="true"/>

@@ -35,7 +35,13 @@ class Dynamic_Block_Factory {
 	 *
 	 * @param string $file_or_folder Path to the JSON file with metadata definition for
 	 *                               the block or path to the folder where the `block.json` file is located.
-	 * @param $args
+	 * @param array  $args {
+	 *      Optional. Array of block type arguments. Accepts any public property of `WP_Block_Type`.
+	 *      Any arguments may be defined, however the ones described below are supported by default.
+	 *      Default empty array.
+	 *
+	 *     @type callable $render_callback Callback used to render blocks of this block type.
+	 * }
 	 */
 	public function __construct( $file_or_folder, $args = array() ) {
 		$filename      = 'block.json';
@@ -46,7 +52,7 @@ class Dynamic_Block_Factory {
 			return false;
 		}
 
-		$metadata = json_decode( file_get_contents( $metadata_file ), true );
+		$metadata = json_decode( file_get_contents( $metadata_file ), true ); // phpcs:ignore
 		if ( ! is_array( $metadata ) || empty( $metadata['name'] ) ) {
 			return false;
 		}
@@ -114,7 +120,6 @@ class Dynamic_Block_Factory {
 	 * @param array  $args Optional. Additional arguments passed to the template.
 	 *                     Default empty array.
 	 *
-	 *
 	 * @return string
 	 */
 	private function get_template_part( $slug, $name = null, $args = array() ) {
@@ -129,8 +134,8 @@ class Dynamic_Block_Factory {
 	/**
 	 * Set template argument.
 	 *
-	 * @param string $key
-	 * @param mixed $value
+	 * @param string $key variable name.
+	 * @param mixed  $value variable value.
 	 */
 	public function set_template_argument( $key, $value ) {
 		$this->args[ $key ] = $value;
@@ -155,8 +160,17 @@ class Dynamic_Block_Factory {
 			$this->name,
 		);
 
-		$this->set_template_argument('class_name', $class_name );
-		$output     = $this->get_template_part( join( '/', $path ), $this->get_style_name( $class_name ), $this->args );
+		$this->set_template_argument( 'class_name', $class_name );
+
+		/**
+		 * Fires after set template argument.
+		 *
+		 * @param Dynamic_Block_Factory $this The Dynamic_Block_Factory instance (passed by reference).
+		 * @param array                 $attributes block attributes.
+		 */
+		add_action( 'hw_dynamic_block_factory_template_argument', $this, $attributes );
+
+		$output = $this->get_template_part( join( '/', $path ), $this->get_style_name( $class_name ), $this->args );
 
 		if ( $output ) {
 			return $output;

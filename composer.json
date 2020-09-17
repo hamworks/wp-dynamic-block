@@ -8,10 +8,12 @@
         }
     ],
     "require": {
+        "ext-json": "*"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "*",
         "dealerdirect/phpcodesniffer-composer-installer": "*",
+        "phpcompatibility/phpcompatibility-wp": "*",
         "wp-coding-standards/wpcs": "*"
     },
     "autoload": {
