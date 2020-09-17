@@ -7,7 +7,7 @@ namespace HAMWORKS\WP\Dynamic_Block;
 /**
  * Block
  **/
-class Dynamic_Block_Factory {
+class Dynamic_Block {
 
 	/**
 	 * Block name.
@@ -165,7 +165,7 @@ class Dynamic_Block_Factory {
 		/**
 		 * Fires after set template argument.
 		 *
-		 * @param Dynamic_Block_Factory $this The Dynamic_Block_Factory instance (passed by reference).
+		 * @param Dynamic_Block_ $this The Dynamic_Block_Factory instance (passed by reference).
 		 * @param array                 $attributes block attributes.
 		 */
 		add_action( 'hw_dynamic_block_factory_template_argument', $this, $attributes );

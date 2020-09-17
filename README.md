@@ -1,8 +1,8 @@
 # wp-dynamic-block
 
-## HAMWORKS\WP\Dynamic_Block\Dynamic_Block_Factory
+## HAMWORKS\WP\Dynamic_Block\Dynamic_Block
 
-### Dynamic_Block_Factory::__construct(  $file_or_folder, $args = array() );
+### Dynamic_Block::__construct(  $file_or_folder, $args = array() );
 
 `$file_or_folder`:  Path to the JSON file with metadata definition for the block or path to the folder where the `block.json` file is located.
 
@@ -10,7 +10,7 @@
 
 
 ```php
-$dynamic_block = new HAMWORKS\WP\Dynamic_Block\Dynamic_Block_Factory( __DIR__ );
+$dynamic_block = new HAMWORKS\WP\Dynamic_Block\Dynamic_Block( __DIR__ );
 ```
 
 ## Template
