@@ -28,13 +28,12 @@ wp-content/themes/your-theme/template-parts/blocks/block-namespace/blockname.php
 ## How to adding template arguments.
 
 ```php
-add_filter( "hw_dynamic_block_{$block_name_in_block_json}_template_arguments", function ( $arguments ) {
+use HAMWORKS\WP\Dynamic_Block\Dynamic_Block;
+add_filter( "hw_dynamic_block_template_arguments_to_{$block_name_in_block_json}", function ( array $arguments, array $attributes, Dynamic_Block $block_instance ) {
 	$arguments['foo'] = 'bar';
-
 	return $arguments;
-} );
+}, 10, 3 );
 ```
-
 
 ## Example
 

@@ -6,7 +6,7 @@
 namespace HAMWORKS\WP\Dynamic_Block;
 
 /**
- * Block
+ * Dynamic_Block class.
  **/
 class Dynamic_Block {
 
@@ -118,7 +118,7 @@ class Dynamic_Block {
 	 */
 	private function get_template_parts_dir() {
 		$template_part_dir = 'template-parts/blocks';
-		$template_part_dir = apply_filters( "hw_dynamic_block_{$this->name}_template_parts_dir", $template_part_dir, $this );
+		$template_part_dir = apply_filters( "hw_dynamic_block_template_parts_dir_to_{$this->name}", $template_part_dir, $this );
 
 		return trim( $template_part_dir, '/\\' );
 	}
@@ -180,7 +180,7 @@ class Dynamic_Block {
 		 * @param array<string, mixed> $attributes block attributes.
 		 */
 		$arguments                     = array();
-		$additional_template_arguments = apply_filters( "hw_dynamic_block_{$this->name}_template_arguments", $arguments, $attributes );
+		$additional_template_arguments = apply_filters( "hw_dynamic_block_template_arguments_to_{$this->name}", $arguments, $attributes, $this );
 		foreach ( $additional_template_arguments as $key => $value ) {
 			$this->set_template_argument( $key, $value );
 		}
@@ -192,7 +192,7 @@ class Dynamic_Block {
 		}
 
 		$template_path = $this->dir . '/template.php';
-		$template_path = apply_filters( "hw_dynamic_block_{$this->name}_fallback_template_path", $template_path, $this );
+		$template_path = apply_filters( "hw_dynamic_block_fallback_template_path_to_{$this->name}", $template_path, $this );
 
 		if ( file_exists( $template_path ) ) {
 			ob_start();
