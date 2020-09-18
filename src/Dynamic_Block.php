@@ -73,6 +73,15 @@ class Dynamic_Block {
 	}
 
 	/**
+	 * Block name getter.
+	 *
+	 * @return string
+	 */
+	public function get_name() {
+		return $this->name;
+	}
+
+	/**
 	 * Render callback
 	 *
 	 * @param array $attributes block attributes.
@@ -109,7 +118,7 @@ class Dynamic_Block {
 	 */
 	private function get_template_parts_dir() {
 		$template_part_dir = 'template-parts/blocks';
-		$template_part_dir = apply_filters( 'hw_dynamic_block_template_parts_dir', $template_part_dir );
+		$template_part_dir = apply_filters( "hw_dynamic_block_{$this->name}_template_parts_dir", $template_part_dir, $this );
 
 		return trim( $template_part_dir, '/\\' );
 	}
@@ -167,10 +176,15 @@ class Dynamic_Block {
 		/**
 		 * Fires after set template argument.
 		 *
-		 * @param Dynamic_Block $this The Dynamic_Block_Factory instance (passed by reference).
+		 * @param array $arguments  An dictionary of additional arguments.
 		 * @param array $attributes block attributes.
 		 */
-		do_action( 'hw_dynamic_block_template_argument', $this, $attributes );
+		$arguments                     = array();
+		$additional_template_arguments = apply_filters( "hw_dynamic_block_{$this->name}_template_arguments", $arguments, $attributes );
+
+		foreach ( $additional_template_arguments as $key => $value ) {
+			$this->set_template_argument( $key, $value );
+		}
 
 		$output = $this->get_template_part( join( '/', $path ), $this->get_style_name( $class_name ), $this->args );
 
@@ -179,7 +193,7 @@ class Dynamic_Block {
 		}
 
 		$template_path = $this->dir . '/template.php';
-		$template_path = apply_filters( 'hw_dynamic_block_fallback_template_path', $template_path, $this );
+		$template_path = apply_filters( "hw_dynamic_block_{$this->name}_fallback_template_path", $template_path, $this );
 
 		if ( file_exists( $template_path ) ) {
 			ob_start();
