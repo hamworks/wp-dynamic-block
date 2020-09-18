@@ -176,12 +176,11 @@ class Dynamic_Block {
 		/**
 		 * Fires after set template argument.
 		 *
-		 * @param array $arguments  An dictionary of additional arguments.
-		 * @param array $attributes block attributes.
+		 * @param array<string, mixed> $arguments  An dictionary of additional arguments.
+		 * @param array<string, mixed> $attributes block attributes.
 		 */
 		$arguments                     = array();
 		$additional_template_arguments = apply_filters( "hw_dynamic_block_{$this->name}_template_arguments", $arguments, $attributes );
-
 		foreach ( $additional_template_arguments as $key => $value ) {
 			$this->set_template_argument( $key, $value );
 		}

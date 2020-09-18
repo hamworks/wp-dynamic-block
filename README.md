@@ -23,3 +23,19 @@ wp-content/themes/your-theme/template-parts/blocks/block-namespace/blockname.php
 
 1. template-parts/blocks/block-namespace/blockname-blockstyle.php
 2. template-parts/blocks/block-namespace/blockname.php
+
+
+## How to adding template arguments.
+
+```php
+add_filter( "hw_dynamic_block_{$block_name_in_block_json}_template_arguments", function ( $arguments ) {
+	$arguments['foo'] = 'bar';
+
+	return $arguments;
+} );
+```
+
+
+## Example
+
+see [https://github.com/team-hamworks/terms-block](https://github.com/team-hamworks/terms-block)
