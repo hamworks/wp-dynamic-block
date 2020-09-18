@@ -1,5 +1,7 @@
 # wp-dynamic-block
 
+Library for Custom Dynamic Block.
+
 ## HAMWORKS\WP\Dynamic_Block\Dynamic_Block
 
 ### Dynamic_Block::__construct(  $file_or_folder, $args = array() );
