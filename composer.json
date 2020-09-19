@@ -18,7 +18,8 @@
     },
     "autoload": {
         "psr-4": {
-            "HAMWORKS\\WP\\Dynamic_Block\\" : "src/"
+            "HAMWORKS\\WP\\Dynamic_Block\\" : "src/",
+            "HAMWORKS\\WP\\Dynamic_Block\\Tests\\" : "tests/"
         }
     },
     "scripts" : {
