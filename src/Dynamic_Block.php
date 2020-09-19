@@ -213,7 +213,7 @@ class Dynamic_Block {
 
 		$this->set_template_argument( 'class_name', $class_name );
 		$this->set_template_argument( 'content', $content );
-
+		$this->set_template_argument( 'wp_block', $wp_block );
 		/**
 		 * Fires after set template argument.
 		 *
