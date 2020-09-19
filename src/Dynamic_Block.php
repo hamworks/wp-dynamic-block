@@ -29,7 +29,7 @@ class Dynamic_Block {
 	 *
 	 * @var false|\WP_Block_Type
 	 */
-	private $block_type;
+	private $wp_block_type;
 
 	/**
 	 * Block constructor.
@@ -37,9 +37,9 @@ class Dynamic_Block {
 	 * @param string $file_or_folder Path to the JSON file with metadata definition for
 	 *                               the block or path to the folder where the `block.json` file is located.
 	 * @param array  $args {
-	 *         Optional. Array of block type arguments. Accepts any public property of `WP_Block_Type`.
-	 *         Any arguments may be defined, however the ones described below are supported by default.
-	 *         Default empty array.
+	 *          Optional. Array of block type arguments. Accepts any public property of `WP_Block_Type`.
+	 *          Any arguments may be defined, however the ones described below are supported by default.
+	 *          Default empty array.
 	 *
 	 * @type callable $render_callback Callback used to render blocks of this block type.
 	 * }
@@ -53,11 +53,6 @@ class Dynamic_Block {
 			return false;
 		}
 
-		$metadata = json_decode( file_get_contents( $metadata_file ), true ); // phpcs:ignore
-		if ( ! is_array( $metadata ) || empty( $metadata['name'] ) ) {
-			return false;
-		}
-
 		$this->dir = dirname( $metadata_file );
 
 		$args = array_merge(
@@ -67,7 +62,7 @@ class Dynamic_Block {
 			$args
 		);
 
-		$this->block_type = $this->register( $file_or_folder, $args );
+		$this->wp_block_type = $this->register( $file_or_folder, $args );
 	}
 
 	/**
@@ -90,7 +85,7 @@ class Dynamic_Block {
 	 * @return bool
 	 */
 	private function is_registered() {
-		return $this->block_type instanceof \WP_Block_Type;
+		return $this->wp_block_type instanceof \WP_Block_Type;
 	}
 
 	/**
@@ -99,20 +94,23 @@ class Dynamic_Block {
 	 * @return string
 	 */
 	public function get_name() {
-		return $this->block_type->name;
+		return $this->wp_block_type->name;
 	}
 
 	/**
 	 * Render callback
 	 *
-	 * @param array $attributes block attributes.
+	 * @param array     $attributes block attributes.
+	 * @param string    $content block children.
+	 * @param \WP_Block $wp_block WP_Block instance.
 	 *
 	 * @return string
 	 */
-	public function render( $attributes ) {
+	public function render( array $attributes, string $content, \WP_Block $wp_block ) {
 		if ( $this->is_registered() ) {
-			return $this->get_content_from_template( $attributes );
+			return $this->get_content_from_template( $attributes, $content, $wp_block );
 		}
+
 		return '';
 	}
 
@@ -153,7 +151,7 @@ class Dynamic_Block {
 	 * @param string $slug The slug name for the generic template.
 	 * @param string $name The name of the specialised template.
 	 * @param array  $args Optional. Additional arguments passed to the template.
-	 *                        Default empty array.
+	 *                         Default empty array.
 	 *
 	 * @return string
 	 */
@@ -164,6 +162,15 @@ class Dynamic_Block {
 		ob_end_clean();
 
 		return $output;
+	}
+
+	/**
+	 * Template arguments.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function get_template_arguments() {
+		return $this->args;
 	}
 
 	/**
@@ -184,11 +191,13 @@ class Dynamic_Block {
 	 *   1. template-parts/blocks/{namespace}/{name}-{style}.php
 	 *   2. template-parts/blocks/{namespace}/{name}.php
 	 *
-	 * @param array $attributes Block attributes.
+	 * @param array     $attributes Block attributes.
+	 * @param string    $content block children.
+	 * @param \WP_Block $wp_block WP_Block instance.
 	 *
 	 * @return string
 	 */
-	protected function get_content_from_template( $attributes ) {
+	protected function get_content_from_template( $attributes, string $content, \WP_Block $wp_block ) {
 		$class_name = join( ' ', $this->get_class_names( $attributes ) );
 		$path       = array(
 			$this->get_template_parts_dir(),
@@ -196,6 +205,7 @@ class Dynamic_Block {
 		);
 
 		$this->set_template_argument( 'class_name', $class_name );
+		$this->set_template_argument( 'content', $content );
 
 		/**
 		 * Fires after set template argument.
@@ -209,7 +219,7 @@ class Dynamic_Block {
 			$this->set_template_argument( $key, $value );
 		}
 
-		$output = $this->get_template_part( join( '/', $path ), $this->get_style_name( $class_name ), $this->args );
+		$output = $this->get_template_part( join( '/', $path ), $this->get_style_name( $class_name ), $this->get_template_arguments() );
 
 		if ( $output ) {
 			return $output;
