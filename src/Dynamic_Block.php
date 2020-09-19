@@ -32,14 +32,21 @@ class Dynamic_Block {
 	private $wp_block_type;
 
 	/**
+	 * Template path.
+	 *
+	 * @var string
+	 */
+	public $template_path = '';
+
+	/**
 	 * Block constructor.
 	 *
 	 * @param string $file_or_folder Path to the JSON file with metadata definition for
 	 *                               the block or path to the folder where the `block.json` file is located.
 	 * @param array  $args {
-	 *          Optional. Array of block type arguments. Accepts any public property of `WP_Block_Type`.
-	 *          Any arguments may be defined, however the ones described below are supported by default.
-	 *          Default empty array.
+	 *           Optional. Array of block type arguments. Accepts any public property of `WP_Block_Type`.
+	 *           Any arguments may be defined, however the ones described below are supported by default.
+	 *           Default empty array.
 	 *
 	 * @type callable $render_callback Callback used to render blocks of this block type.
 	 * }
@@ -53,15 +60,15 @@ class Dynamic_Block {
 			return false;
 		}
 
-		$this->dir = dirname( $metadata_file );
+		$this->dir           = dirname( $metadata_file );
+		$this->template_path = $this->dir . '/template.php';
 
-		$args = array_merge(
+		$args                = array_merge(
 			array(
 				'render_callback' => array( $this, 'render' ),
 			),
 			$args
 		);
-
 		$this->wp_block_type = $this->register( $file_or_folder, $args );
 	}
 
@@ -151,7 +158,7 @@ class Dynamic_Block {
 	 * @param string $slug The slug name for the generic template.
 	 * @param string $name The name of the specialised template.
 	 * @param array  $args Optional. Additional arguments passed to the template.
-	 *                         Default empty array.
+	 *                          Default empty array.
 	 *
 	 * @return string
 	 */
@@ -225,8 +232,7 @@ class Dynamic_Block {
 			return $output;
 		}
 
-		$template_path = $this->dir . '/template.php';
-		$template_path = apply_filters( "hw_dynamic_block_fallback_template_path_to_{$this->get_name()}", $template_path, $this );
+		$template_path = apply_filters( "hw_dynamic_block_fallback_template_path_to_{$this->get_name()}", $this->template_path, $this );
 
 		if ( file_exists( $template_path ) ) {
 			ob_start();
