@@ -1,0 +1,22 @@
+{
+    "name": "hw-dynamic-block/test-block",
+    "title": "Test Block",
+    "icon": "smiley",
+    "description": "block for test",
+    "textdomain": "hw-dynamic-block",
+    "attributes": {
+        "className": {
+            "type": "string",
+            "default": ""
+        },
+        "testString": {
+            "type": "string",
+            "default": ""
+        },
+        "testNumber": {
+            "type": "number",
+            "default": 0
+        }
+    },
+    "category": "common"
+}
