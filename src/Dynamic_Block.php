@@ -11,13 +11,6 @@ namespace HAMWORKS\WP\Dynamic_Block;
 class Dynamic_Block {
 
 	/**
-	 * Block name.
-	 *
-	 * @var string
-	 */
-	private $name;
-
-	/**
 	 * Path to the folder where the `block.json` file is located.
 	 *
 	 * @var string
@@ -32,14 +25,21 @@ class Dynamic_Block {
 	protected $args;
 
 	/**
+	 * Block type instance.
+	 *
+	 * @var false|\WP_Block_Type
+	 */
+	private $block_type;
+
+	/**
 	 * Block constructor.
 	 *
 	 * @param string $file_or_folder Path to the JSON file with metadata definition for
 	 *                               the block or path to the folder where the `block.json` file is located.
 	 * @param array  $args {
-	 *        Optional. Array of block type arguments. Accepts any public property of `WP_Block_Type`.
-	 *        Any arguments may be defined, however the ones described below are supported by default.
-	 *        Default empty array.
+	 *         Optional. Array of block type arguments. Accepts any public property of `WP_Block_Type`.
+	 *         Any arguments may be defined, however the ones described below are supported by default.
+	 *         Default empty array.
 	 *
 	 * @type callable $render_callback Callback used to render blocks of this block type.
 	 * }
@@ -60,16 +60,37 @@ class Dynamic_Block {
 
 		$this->dir = dirname( $metadata_file );
 
-		$this->name = $metadata['name'];
-		register_block_type_from_metadata(
-			$file_or_folder,
-			array_merge(
-				array(
-					'render_callback' => array( $this, 'render' ),
-				),
-				$args
-			)
+		$args = array_merge(
+			array(
+				'render_callback' => array( $this, 'render' ),
+			),
+			$args
 		);
+
+		$this->block_type = $this->register( $file_or_folder, $args );
+	}
+
+	/**
+	 * Register block type.
+	 *
+	 * @param string $file_or_folder Path to the JSON file with metadata definition for
+	 *                               the block or path to the folder where the `block.json` file is located.
+	 * @param array  $args Optional. Array of block type arguments.
+	 *
+	 * @return bool|false|\WP_Block_Type
+	 */
+	private function register( $file_or_folder, $args ) {
+		return register_block_type_from_metadata(
+			$file_or_folder,
+			$args
+		);
+	}
+
+	/**
+	 * @return bool
+	 */
+	private function is_registered() {
+		return $this->block_type instanceof \WP_Block_Type;
 	}
 
 	/**
@@ -78,7 +99,7 @@ class Dynamic_Block {
 	 * @return string
 	 */
 	public function get_name() {
-		return $this->name;
+		return $this->block_type->name;
 	}
 
 	/**
@@ -86,10 +107,13 @@ class Dynamic_Block {
 	 *
 	 * @param array $attributes block attributes.
 	 *
-	 * @return false|string
+	 * @return string
 	 */
 	public function render( $attributes ) {
-		return $this->get_content_from_template( $attributes );
+		if ( $this->is_registered() ) {
+			return $this->get_content_from_template( $attributes );
+		}
+		return '';
 	}
 
 	/**
@@ -118,7 +142,7 @@ class Dynamic_Block {
 	 */
 	private function get_template_parts_dir() {
 		$template_part_dir = 'template-parts/blocks';
-		$template_part_dir = apply_filters( "hw_dynamic_block_template_parts_dir_to_{$this->name}", $template_part_dir, $this );
+		$template_part_dir = apply_filters( "hw_dynamic_block_template_parts_dir_to_{$this->get_name()}", $template_part_dir, $this );
 
 		return trim( $template_part_dir, '/\\' );
 	}
@@ -129,7 +153,7 @@ class Dynamic_Block {
 	 * @param string $slug The slug name for the generic template.
 	 * @param string $name The name of the specialised template.
 	 * @param array  $args Optional. Additional arguments passed to the template.
-	 *                       Default empty array.
+	 *                        Default empty array.
 	 *
 	 * @return string
 	 */
@@ -168,7 +192,7 @@ class Dynamic_Block {
 		$class_name = join( ' ', $this->get_class_names( $attributes ) );
 		$path       = array(
 			$this->get_template_parts_dir(),
-			$this->name,
+			$this->get_name(),
 		);
 
 		$this->set_template_argument( 'class_name', $class_name );
@@ -176,11 +200,11 @@ class Dynamic_Block {
 		/**
 		 * Fires after set template argument.
 		 *
-		 * @param array<string, mixed> $arguments  An dictionary of additional arguments.
+		 * @param array<string, mixed> $arguments An dictionary of additional arguments.
 		 * @param array<string, mixed> $attributes block attributes.
 		 */
 		$arguments                     = array();
-		$additional_template_arguments = apply_filters( "hw_dynamic_block_template_arguments_to_{$this->name}", $arguments, $attributes, $this );
+		$additional_template_arguments = apply_filters( "hw_dynamic_block_template_arguments_to_{$this->get_name()}", $arguments, $attributes, $this );
 		foreach ( $additional_template_arguments as $key => $value ) {
 			$this->set_template_argument( $key, $value );
 		}
@@ -192,7 +216,7 @@ class Dynamic_Block {
 		}
 
 		$template_path = $this->dir . '/template.php';
-		$template_path = apply_filters( "hw_dynamic_block_fallback_template_path_to_{$this->name}", $template_path, $this );
+		$template_path = apply_filters( "hw_dynamic_block_fallback_template_path_to_{$this->get_name()}", $template_path, $this );
 
 		if ( file_exists( $template_path ) ) {
 			ob_start();
